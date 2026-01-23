@@ -1,6 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "./TopPicksRow.css";
+import {
+  FaPassport,
+  FaCode,
+  FaBriefcase,
+  FaHandsHelping,
+  FaProjectDiagram,
+  FaEnvelope,
+  FaCertificate,
+  FaMusic,
+} from "react-icons/fa";
 
 import { ProfileType } from "../types";
 
