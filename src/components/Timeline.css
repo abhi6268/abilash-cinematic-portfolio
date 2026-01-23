@@ -1,0 +1,149 @@
+.timeline-wrap {
+    padding: 48px 24px 80px;
+    background: #0b0b0b;
+    color: #fff;
+    min-height: 100vh;
+}
+
+.timeline-hero {
+    max-width: 1100px;
+    margin: 6px auto 28px;
+}
+
+.timeline-title {
+    font-size: 30px;
+    margin: 0 0 8px;
+    letter-spacing: 0.2px;
+}
+
+.timeline-subtitle {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 820px;
+    line-height: 1.5;
+}
+
+.timeline-section {
+    max-width: 1100px;
+    margin: 28px auto 0;
+}
+
+.timeline-section-title {
+    font-size: 20px;
+    margin: 0 0 14px;
+    display: inline-block;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e50914;
+}
+
+.season-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 16px;
+}
+
+.season-card {
+    grid-column: span 6;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    padding: 16px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+    position: relative;
+    overflow: hidden;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.season-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(229, 9, 20, 0.55);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.season-edu {
+    grid-column: span 6;
+    border-color: rgba(255, 255, 255, 0.10);
+}
+
+.season-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.season-badge {
+    background: rgba(229, 9, 20, 0.18);
+    border: 1px solid rgba(229, 9, 20, 0.35);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+}
+
+.season-dates {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+.season-role {
+    margin: 0 0 4px;
+    font-size: 18px;
+}
+
+.season-company {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.78);
+    margin-bottom: 10px;
+}
+
+.season-tech {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+    line-height: 1.4;
+    margin-bottom: 14px;
+}
+
+.episode-list {
+    display: grid;
+    gap: 10px;
+}
+
+.episode {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 10px;
+    align-items: start;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    padding: 10px;
+}
+
+.episode-num {
+    width: 44px;
+    height: 28px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    background: rgba(229, 9, 20, 0.22);
+    border: 1px solid rgba(229, 9, 20, 0.35);
+    font-size: 12px;
+}
+
+.episode-text {
+    font-size: 13px;
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.82);
+}
+
+.timeline-loading {
+    padding: 40px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+@media (max-width: 900px) {
+    .season-card {
+        grid-column: span 12;
+    }
+}

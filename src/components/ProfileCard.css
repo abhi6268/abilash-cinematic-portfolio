@@ -1,0 +1,177 @@
+.profile-card {
+  width: 170px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  color: #fff;
+  text-align: center;
+  transition: transform 180ms ease, filter 180ms ease;
+}
+
+.profile-art {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  margin: 0 auto 14px;
+  border-radius: 12px;
+  overflow: hidden;
+  transform: translateZ(0);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.55);
+  outline: 2px solid rgba(255, 255, 255, 0);
+  transition: outline-color 180ms ease, box-shadow 180ms ease;
+}
+
+.profile-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.02);
+  transition: transform 220ms ease;
+}
+
+.profile-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(transparent 40%, rgba(0, 0, 0, 0.55));
+  pointer-events: none;
+}
+
+.profile-sheen {
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.12), transparent 70%);
+  transform: translateX(-60%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Meta */
+.profile-name {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.profile-tagline {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.7;
+  letter-spacing: 0.4px;
+}
+
+/* Hover / focus = Netflix style pop */
+.profile-card:hover {
+  transform: scale(1.06);
+}
+
+.profile-card:hover .profile-img {
+  transform: scale(1.12);
+}
+
+.profile-card:hover .profile-art {
+  outline-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.7);
+}
+
+.profile-card:hover .profile-sheen {
+  opacity: 1;
+  animation: sheen 900ms ease forwards;
+}
+
+.profile-card:focus-visible .profile-art {
+  outline-color: rgba(255, 255, 255, 0.55);
+}
+
+/* Genre glow base */
+.profile-art::after {
+  content: "";
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 55%, transparent) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 180ms ease;
+  pointer-events: none;
+}
+
+.profile-card:hover .profile-art::after,
+.profile-card:focus-visible .profile-art::after {
+  opacity: 1;
+}
+
+/* -------------------------
+   Genre behaviors
+-------------------------- */
+
+/* Recruiter = calm, premium, steady */
+.profile-card.recruiter:hover {
+  filter: saturate(1.05);
+}
+
+/* Builder = subtle pulse like an engine */
+.profile-card.builder:hover .profile-art {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+/* Researcher = scanning beam */
+.profile-card.researcher .profile-art::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 35%, rgba(229, 9, 20, 0.18), transparent 70%);
+  transform: translateX(-120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.profile-card.researcher:hover .profile-art::before {
+  opacity: 1;
+  animation: scan 1.3s linear infinite;
+}
+
+/* Explorer = gentle drift */
+.profile-card.explorer:hover .profile-img {
+  transform: scale(1.16) translateY(-4px);
+}
+
+/* Animations */
+@keyframes sheen {
+  from { transform: translateX(-60%); }
+  to { transform: translateX(60%); }
+}
+
+@keyframes pulse {
+  0% { box-shadow: 0 10px 30px rgba(0,0,0,0.55); }
+  50% { box-shadow: 0 14px 45px rgba(0,0,0,0.7); }
+  100% { box-shadow: 0 10px 30px rgba(0,0,0,0.55); }
+}
+
+@keyframes scan {
+  from { transform: translateX(-120%); }
+  to { transform: translateX(120%); }
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-card,
+  .profile-img,
+  .profile-art,
+  .profile-sheen {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+.profile-page {
+  animation: profile-enter 420ms ease both;
+}
+
+@keyframes profile-enter {
+  from { opacity: 0; filter: blur(3px); transform: scale(1.01); }
+  to { opacity: 1; filter: blur(0); transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-page {
+    animation: none !important;
+  }
+}

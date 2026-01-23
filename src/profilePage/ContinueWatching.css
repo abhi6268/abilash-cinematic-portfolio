@@ -1,0 +1,119 @@
+.cw-row {
+  padding: 20px 24px 30px;
+  color: #fff;
+}
+
+.cw-title {
+  font-size: 2.3rem;
+  margin: 0 0 14px;
+}
+
+.cw-track {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding: 18px 8px 24px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.cw-track::-webkit-scrollbar {
+  display: none;
+}
+
+.cw-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: 520px;
+  height: 230px;
+  border-radius: 18px;
+  overflow: hidden;
+  cursor: pointer;
+
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.10);
+  box-shadow: 0 16px 50px rgba(0,0,0,0.55);
+
+  will-change: transform;
+  transform: translate3d(0,0,0);
+  transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+}
+
+.cw-card:hover {
+  transform: scale(1.035);
+  z-index: 25;
+  border-color: rgba(229, 9, 20, 0.55);
+  box-shadow:
+          0 24px 80px rgba(0,0,0,0.75),
+          0 0 0 2px rgba(229, 9, 20, 0.25),
+          0 0 26px rgba(229, 9, 20, 0.25);
+}
+
+.cw-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: translateZ(0);
+  filter: brightness(0.75) contrast(1.1);
+}
+
+.cw-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  gap: 10px;
+  background: radial-gradient(transparent 22%, rgba(0,0,0,0.78));
+}
+
+.cw-label {
+  font-size: 52px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  text-shadow: 0 10px 26px rgba(0,0,0,0.75);
+}
+
+.cw-play {
+  position: absolute;
+  right: 18px;
+  top: 18px;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 160ms ease, transform 160ms ease, background 160ms ease;
+}
+
+.cw-card:hover .cw-play {
+  opacity: 1;
+  transform: scale(1);
+  background: rgba(229, 9, 20, 0.22);
+  border-color: rgba(229, 9, 20, 0.35);
+}
+
+.cw-progress {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  bottom: 16px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.16);
+  overflow: hidden;
+}
+
+.cw-progressFill {
+  height: 100%;
+  border-radius: 999px;
+  background: #e50914;
+}
+
