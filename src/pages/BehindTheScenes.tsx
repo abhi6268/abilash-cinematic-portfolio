@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./BehindTheScenes.css";
-import TechTrailerHero from "../components/TechTrailerHero";
 
 const METRICS = [
     { label: "LCP", value: "1.4s", note: "Cached posters + lazy video" },
