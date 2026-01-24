@@ -79,18 +79,17 @@ const Browse: React.FC<Props> = ({ setTransitionOn }) => {
     });
   }, []);
 
-  const handleProfileClick = async (profile: Profile) => {
+  const handleProfileClick = (profile: Profile) => {
     setTransitionOn(true);
 
-    await preloadImage(profile.backgroundGif);
 
-    window.setTimeout(() => {
+    preloadImage(profile.backgroundGif);
+
+    requestAnimationFrame(() => {
       navigate(`/profile/${profile.variant}`, {
         state: { profileImage: profile.image, backgroundGif: profile.backgroundGif },
       });
-
-      window.setTimeout(() => setTransitionOn(false), 200);
-    }, 120);
+    });
   };
 
   return (

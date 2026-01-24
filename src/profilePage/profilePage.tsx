@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import "./ProfilePage.css";
 
@@ -8,10 +8,14 @@ import ContinueWatching from "./ContinueWatching";
 import { PROFILE_LIST, ProfileType } from "../types";
 
 const BG_BY_PROFILE: Record<ProfileType, string> = {
-    recruiter: "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3NpcDVicHlhOWtuaHBzeHF2MzI3ZW5iN2wxcmgzNWRmZGExZGp4MCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9dg/rjXO2H5gBcysUCcp83/giphy.gif",
-    builder: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdTgwaXo1cndqeHJ1eTFweTk5bnVjeTB3OHBua3dmMmpsdHI3ZjdpcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/zOvBKUUEERdNm/giphy.gif",
-    researcher: "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXQ5b2dlOWp1NHd1MXU3YWRua3o2d2ZreHpha2wwMWh4d2F2MmFtaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9dg/DSegqXluO4ZN8vc4xQ/giphy.gif",
-    explorer: "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NmRvcmYyZnc5b3V0YmE5ejdoZWwzMmsxdW5ucnRybXRibmQweW96eSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Vww6NlC3ifjX52dzGn/giphy.gif",
+    recruiter:
+        "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExM3NpcDVicHlhOWtuaHBzeHF2MzI3ZW5iN2wxcmgzNWRmZGExZGp4MCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9dg/rjXO2H5gBcysUCcp83/giphy.gif",
+    builder:
+        "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExdTgwaXo1cndqeHJ1eTFweTk5bnVjeTB3OHBua3dmMmpsdHI3ZjdpcCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/zOvBKUUEERdNm/giphy.gif",
+    researcher:
+        "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXQ5b2dlOWp1NHd1MXU3YWRua3o2d2ZreHpha2wwMWh4d2F2MmFtaSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9dg/DSegqXluO4ZN8vc4xQ/giphy.gif",
+    explorer:
+        "https://media.giphy.com/media/v1.Y2lkPWVjZjA1ZTQ3NmRvcmYyZnc5b3V0YmE5ejdoZWwzMmsxdW5ucnRybXRibmQweW96eSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/Vww6NlC3ifjX52dzGn/giphy.gif",
 };
 
 type Props = {
@@ -26,22 +30,42 @@ const ProfilePage: React.FC<Props> = ({ setTransitionOn }) => {
         ? (profileName as ProfileType)
         : "recruiter";
 
+    // Prefer backgroundGif passed from Browse state, fallback to BG_BY_PROFILE map
     const backgroundGif = useMemo(() => {
         const state = location.state as { backgroundGif?: string } | null;
         return state?.backgroundGif || BG_BY_PROFILE[profile];
     }, [location.state, profile]);
 
+    // Hide overlay only after the bg image is loaded + painted
+    useEffect(() => {
+        let cancelled = false;
+
+        const img = new Image();
+        img.src = backgroundGif;
+
+        const done = () => {
+            // wait 2 frames so the background style is painted
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    if (!cancelled) setTransitionOn(false);
+                });
+            });
+        };
+
+        img.onload = done;
+        img.onerror = done;
+
+        return () => {
+            cancelled = true;
+        };
+    }, [backgroundGif, setTransitionOn]);
+
     return (
         <>
-            <img
-                src={backgroundGif}
-                alt=""
-                style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
-                onLoad={() => requestAnimationFrame(() => setTransitionOn(false))}
-                onError={() => setTransitionOn(false)}
-            />
-
-            <div className="profile-page" style={{ backgroundImage: `url(${backgroundGif})` }}>
+            <div
+                className="profile-page"
+                style={{ backgroundImage: `url(${backgroundGif})` }}
+            >
                 <ProfileBanner profile={profile} />
             </div>
 

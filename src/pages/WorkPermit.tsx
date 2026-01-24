@@ -1,10 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import './WorkPermit.css';
-import { getWorkPermit } from '../data/getWorkPermit';
-import { WorkPermit as IWorkPermit } from '../types';
-const WorkPermit: React.FC = () => {
+import React, { useEffect, useState } from "react";
+import "./WorkPermit.css";
+import { getWorkPermit } from "../data/getWorkPermit";
+import { WorkPermit as IWorkPermit } from "../types";
+import { useNavigate } from "react-router-dom";
 
+const WorkPermit: React.FC = () => {
   const [workPermitData, setWorkPermitData] = useState<IWorkPermit | null>(null);
+  const navigate = useNavigate();
+
   useEffect(() => {
     async function fetchWorkPermitData() {
       const data = await getWorkPermit();
@@ -13,24 +16,48 @@ const WorkPermit: React.FC = () => {
     fetchWorkPermitData();
   }, []);
 
-  if (!workPermitData) return <div>Loading...</div>;
+  if (!workPermitData) return <div className="work-permit-loading">Loading…</div>;
 
   return (
-      <div className="work-permit-container">
-        <div className="work-permit-card">
-          <h2 className="work-permit-headline">🪪 Work Authorization</h2>
+      <section className="work-permit-hero">
+        <div className="work-permit-vignette" />
+        <div className="work-permit-content">
+          <div className="work-permit-kicker">Work Authorization</div>
+
+          <h1 className="work-permit-title">
+            Authorized to work in the U.S.
+            <span className="work-permit-title-accent"> No sponsorship required.</span>
+          </h1>
+
+          <div className="work-permit-meta">
+            <span className="chip chip-red">No Sponsorship</span>
+            <span className="chip">U.S. Authorized</span>
+            <span className="chip">{workPermitData.visaStatus}</span>
+          </div>
 
           <p className="work-permit-summary">
-            I am a <strong>{workPermitData.visaStatus}</strong>, fully authorized to work in the United States 🇺🇸
-            with <strong>no sponsorship required</strong>. This allows me to focus entirely on delivering impact,
-            growing professionally, and contributing long-term. 🚀
+            I’m currently <strong>{workPermitData.visaStatus}</strong> and fully eligible to work in the United States
+            with <strong>no employer sponsorship</strong>. That means I can start contributing immediately and focus on
+            shipping impact long-term.
           </p>
 
           {workPermitData.additionalInfo && (
-              <p className="additional-info">{workPermitData.additionalInfo}</p>
+              <div className="work-permit-note">
+                <div className="note-label">Details</div>
+                <div className="note-text">{workPermitData.additionalInfo}</div>
+              </div>
           )}
+
+          <div className="work-permit-cta">
+            <button className="btn btn-primary" onClick={() => navigate("/resume")}>
+              View Resume
+            </button>
+            <button className="btn btn-secondary" onClick={() => navigate("/contact-me")}>
+              Contact
+            </button>
+          </div>
         </div>
-      </div>
+      </section>
   );
 };
 
