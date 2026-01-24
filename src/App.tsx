@@ -16,6 +16,7 @@ import Timeline from "./components/Timeline";
 import BehindTheScenes from "./pages/BehindTheScenes";
 import WorkStories from "./pages/WorkStories";
 import ScrollToTop from "./components/ScrollToTop";
+import { Analytics } from "@vercel/analytics/react";
 
 
 const App: React.FC = () => {
@@ -41,6 +42,7 @@ const App: React.FC = () => {
         <Route path="/resume" element={<Layout><Resume /></Layout>} />
 
     </Routes>
+        <Analytics />
           </>
   );
 };
