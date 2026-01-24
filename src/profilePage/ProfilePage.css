@@ -1,20 +1,33 @@
 .profile-page {
-  display: flex;
-  align-items: center;
+  position: relative;
   height: 75vh;
   color: #fff;
+
   background-size: cover;
   background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  align-items: flex-end;
 }
 
-h1 {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
+/* dark overlay so text is readable */
+.profile-page::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+          to top,
+          rgba(0,0,0,0.75) 0%,
+          rgba(0,0,0,0.35) 45%,
+          rgba(0,0,0,0.15) 100%
+  );
+  pointer-events: none;
 }
 
 @media (max-width: 768px) {
   .profile-page {
     height: 100vh;
-    padding-bottom: 5rem;
+    align-items: flex-end;
   }
 }

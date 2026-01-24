@@ -28,7 +28,14 @@ const App: React.FC = () => {
     <Routes>
       <Route path="/" element={<NetflixTitle />} />
       <Route path="/browse" element={<Browse setTransitionOn={setTransitionOn} />} />
-      <Route path="/profile/:profileName" element={<Layout><ProfilePage /></Layout>} />
+      <Route
+          path="/profile/:profileName"
+          element={
+            <Layout>
+              <ProfilePage setTransitionOn={setTransitionOn} />
+            </Layout>
+          }
+      />
       <Route path="/work-permit" element={<Layout><WorkPermit /></Layout>} />
       <Route path="/work-experience" element={<Layout><Timeline /></Layout>} />
       <Route path="/recommendations" element={<Layout><Recommendations /></Layout>} />

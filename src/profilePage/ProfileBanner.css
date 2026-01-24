@@ -1,15 +1,18 @@
 .profile-banner {
-  display: flex;
-  align-items: flex-end;
-  justify-content: left;
-  background-size: cover;
-  background-position: center;
-  color: #fff;
-  position: relative;
-  padding-bottom: 0;
   width: 100%;
   height: 100%;
+  min-height: 0;
+
+  display: flex;
+  align-items: flex-end;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  position: relative;
   overflow: hidden;
+
   padding: 40px 20px 20px 20px;
 }
 

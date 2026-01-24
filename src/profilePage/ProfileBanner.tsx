@@ -1,29 +1,24 @@
 import React from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import "./ProfileBanner.css";
 import { profileBannerData } from "../data/profileBanner";
-import { PROFILE_LIST, ProfileType } from "../types";
+import { ProfileType } from "../types";
 import PlayButton from "../components/PlayButton";
 import MoreInfoButton from "../components/MoreInfoButton";
+import { track } from "@vercel/analytics";
 
-const ProfileBanner: React.FC = () => {
-  const { profileName } = useParams<{ profileName: string }>();
+const ProfileBanner: React.FC<{ profile: ProfileType }> = ({ profile }) => {
   const navigate = useNavigate();
 
   const handlePlayClick = () => {
+    track("resume_click", { source: "profile_banner", profile });
     navigate("/resume");
   };
 
   const handleLinkedinClick = () => {
-    window.open(
-        'https://www.linkedin.com/in/abilash-mundlur',
-        '_blank'
-    );
+    track("linkedin_click", { source: "profile_banner", profile });
+    window.open("https://www.linkedin.com/in/abilash-mundlur", "_blank");
   };
-
-  const profile: ProfileType = PROFILE_LIST.includes(profileName as ProfileType)
-      ? (profileName as ProfileType)
-      : "recruiter";
 
   const bg = profileBannerData.backgrounds[profile];
 
@@ -40,7 +35,6 @@ const ProfileBanner: React.FC = () => {
             <PlayButton onClick={handlePlayClick} label="Resume" />
             <MoreInfoButton onClick={handleLinkedinClick} label="Linkedin" />
           </div>
-
         </div>
       </div>
   );

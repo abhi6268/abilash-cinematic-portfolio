@@ -1,53 +1,80 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./NetflixTitle.css";
-import netflixSound from "./netflix-sound.mp3";
 import { useNavigate } from "react-router-dom";
-import logoImage from "../src/images/logo-2.png"; // adjust if needed
-import NetflixAIntro from "./components/NetflixAIntro";      // adjust path
+import "./NetflixTitle.css";
 
-const INTRO_MS = 4200; // match your intro length
+import logoImage from "../src/images/logo-2.png";
+import introVideo from "./assets/Netflix-Logo-A.mp4";
+import netflixSound from "./netflix-sound.mp3";
 
-const NetflixTitle = () => {
-  const [isClicked, setIsClicked] = useState(false);
-  const navigate = useNavigate();
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+type Phase = "banner" | "playing";
 
-  const handleStart = () => {
-    if (isClicked) return;
+export default function NetflixTitle() {
+    const navigate = useNavigate();
 
-    setIsClicked(true);
+    const videoRef = useRef<HTMLVideoElement | null>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    // Play sound (allowed because it comes from click)
-    // Small delay helps sync with first brush motion
-    const audio = audioRef.current;
-    if (audio) {
-      audio.volume = 0.9;
-      audio.currentTime = 0;
-      setTimeout(() => {
-        audio.play().catch(() => {});
-      }, 250);
-    }
-  };
+    const [phase, setPhase] = useState<Phase>("banner");
 
-  useEffect(() => {
-    if (!isClicked) return;
-    const t = setTimeout(() => navigate("/browse"), INTRO_MS);
-    return () => clearTimeout(t);
-  }, [isClicked, navigate]);
+    const startIntro = async () => {
+        if (phase !== "banner") return;
 
-  return (
-      <div className="netflix-container" onClick={handleStart}>
-        {!isClicked ? (
-            <img src={logoImage} alt="Custom Logo" className="netflix-logo" />
-        ) : (
-            <NetflixAIntro start />
-        )}
+        const video = videoRef.current;
+        const audio = audioRef.current;
+        if (!video || !audio) return;
 
-        <audio ref={audioRef} preload="auto">
-          <source src={netflixSound} type="audio/mpeg" />
-        </audio>
-      </div>
-  );
-};
+        try {
+            // reset
+            video.pause();
+            video.currentTime = 0;
 
-export default NetflixTitle;
+            audio.pause();
+            audio.currentTime = 0;
+            audio.volume = 0.9;
+
+            await video.play();
+
+            setPhase("playing");
+
+            await audio.play();
+        } catch (err) {
+        }
+    };
+
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+
+        const onEnded = () => navigate("/browse");
+        const onError = () => navigate("/browse");
+
+        video.addEventListener("ended", onEnded);
+        video.addEventListener("error", onError);
+
+        return () => {
+            video.removeEventListener("ended", onEnded);
+            video.removeEventListener("error", onError);
+        };
+    }, [navigate]);
+
+    return (
+        <div className="intro-root" onClick={startIntro}>
+            <video
+                ref={videoRef}
+                className={`intro-video ${phase === "playing" ? "is-visible" : ""}`}
+                src={introVideo}
+                playsInline
+                preload="auto"
+                muted
+            />
+
+            {phase === "banner" && (
+                <img className="intro-logo" src={logoImage} alt="Logo" />
+            )}
+
+            <audio ref={audioRef} preload="auto">
+                <source src={netflixSound} type="audio/mpeg" />
+            </audio>
+        </div>
+    );
+}
