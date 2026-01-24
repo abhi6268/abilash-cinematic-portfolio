@@ -125,12 +125,12 @@ const TopPicksRow: React.FC<TopPicksRowProps> = ({ profile }) => {
                   <div className="pick-label">{pick.title}</div>
                 </div>
 
-                <div className="pick-progress">
-                  <div
-                      className="pick-progress-fill"
-                      style={{ width: `${Math.max(0, Math.min(1, pick.progress ?? 0)) * 100}%` }}
-                  />
-                </div>
+                {/*<div className="pick-progress">*/}
+                {/*  <div*/}
+                {/*      className="pick-progress-fill"*/}
+                {/*      style={{ width: `${Math.max(0, Math.min(1, pick.progress ?? 0)) * 100}%` }}*/}
+                {/*  />*/}
+                {/*</div>*/}
               </div>
           ))}
         </div>
