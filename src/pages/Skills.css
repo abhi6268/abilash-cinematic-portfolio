@@ -111,3 +111,9 @@
     transform: translateY(10);
   }
 }
+
+.skill-card h3 {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  text-align: center;
+}

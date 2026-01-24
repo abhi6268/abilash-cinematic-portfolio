@@ -37,3 +37,89 @@
     transform: translateY(0);
   }
 }
+
+.timeline-bullets {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  line-height: 1.5;
+}
+
+.timeline-bullets li {
+  margin: 6px 0;
+}
+
+/* Featured card */
+.featured-role .vertical-timeline-element-content {
+  background: radial-gradient(
+          900px 260px at 8% 0%,
+          rgba(255, 60, 120, 0.18),
+          transparent 60%
+  ),
+  linear-gradient(
+          180deg,
+          rgba(255, 255, 255, 0.08),
+          rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(255, 60, 120, 0.22);
+  box-shadow:
+          0 10px 26px rgba(0, 0, 0, 0.35),
+          0 0 0 1px rgba(255, 60, 120, 0.08) inset;
+  border-radius: 16px;
+}
+
+.timeline-content {
+  color: #000;
+}
+
+.timeline-header-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.featured-badge {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 60, 120, 0.35);
+  background: rgba(255, 60, 120, 0.12);
+  color: #111;
+  white-space: nowrap;
+}
+
+/* Tech pills */
+.tech-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.tech-pill {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.22);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* Stronger tech pill style for the featured role */
+.tech-pill-featured {
+  border: 1px solid rgba(255, 60, 120, 0.35);
+  background: rgba(255, 60, 120, 0.14);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+/* Bullets */
+.timeline-bullets {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  line-height: 1.55;
+}
+
+.timeline-bullets li {
+  margin: 6px 0;
+}

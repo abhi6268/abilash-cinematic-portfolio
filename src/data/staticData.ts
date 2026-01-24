@@ -159,6 +159,24 @@ export const skills: Skill[] = [
         description: "Schema-driven API development.",
         icon: "SiGraphql",
     },
+    {
+        name: "REST API Design",
+        category: "Backend",
+        description: "Contracts, pagination, filtering, versioning, error handling.",
+        icon: "SiOpenapiinitiative",
+    },
+    {
+        name: "OAuth2 / JWT",
+        category: "Backend",
+        description: "Secure auth flows, token handling, protected APIs.",
+        icon: "SiAuth0",
+    },
+    {
+        name: "Swagger",
+        category: "Backend",
+        description: "API documentation, schema contracts, and versioned endpoints.",
+        icon: "SiSwagger",
+    },
 
     // ======================
     // Databases
@@ -173,6 +191,12 @@ export const skills: Skill[] = [
         name: "MySQL",
         category: "Databases",
         description: "Relational database and SQL queries.",
+        icon: "SiMysql",
+    },
+    {
+        name: "SQL Optimization",
+        category: "Databases",
+        description: "Indexes, query tuning, schema evolution, performance analysis.",
         icon: "SiMysql",
     },
 
@@ -197,6 +221,24 @@ export const skills: Skill[] = [
         category: "Cloud & DevOps",
         description: "Container orchestration and scaling.",
         icon: "SiKubernetes",
+    },
+    {
+        name: "Azure DevOps",
+        category: "Cloud & DevOps",
+        description: "CI/CD pipelines, build/release automation, environments.",
+        icon: "SiAzuredevops",
+    },
+    {
+        name: "CI/CD",
+        category: "Cloud & DevOps",
+        description: "Automated builds, testing gates, and deployment workflows.",
+        icon: "SiGithubactions",
+    },
+    {
+        name: "Azure Storage",
+        category: "Cloud & DevOps",
+        description: "Blob containers, SAS access patterns, file-based data workflows.",
+        icon: "SiDatabricks",
     },
 
     // ======================
@@ -238,6 +280,12 @@ export const skills: Skill[] = [
         description: "Agile workflows and sprint tracking.",
         icon: "SiJira",
     },
+    {
+        name: "Vite",
+        category: "Testing & Tools",
+        description: "Modern frontend build tooling and fast dev workflows.",
+        icon: "SiVite",
+    },
 
     // ======================
     // AI
@@ -254,51 +302,60 @@ export const timeline: TimelineItem[] = [
     {
         timelineType: "work",
         name: "Ziosk",
-        title: "Full Stack Developer",
-        techStack: "React, TypeScript, Redux, Node.js, Azure, Docker, CI/CD",
+        title: "Full Stack Software Engineer",
+        techStack:
+            "React, TypeScript, Redux, Node.js, Express, MongoDB, MySQL, Azure, Docker, CI/CD",
         summaryPoints: [
-            "Built scalable SPAs using React + TypeScript with predictable state management.",
-            "Made frontend architecture decisions and reusable component patterns across features.",
-            "Integrated Node/Express services with distributed Python and .NET microservices.",
-            "Deployed and supported cloud solutions on Azure with Docker and CI/CD pipelines.",
-            "Improved reliability and performance using production monitoring and debugging."
+            "Architected and delivered large-scale React + TypeScript applications used across enterprise restaurant platforms.",
+            "Owned frontend system design including reusable component libraries, state management, and performance optimizations.",
+            "Built and integrated Node.js/Express APIs with distributed Python and .NET microservices.",
+            "Designed MongoDB and MySQL schemas to support transactional data and analytics use cases.",
+            "Implemented event ingestion and aggregation pipelines to power reporting and operational insights.",
+            "Improved end-to-end performance by optimizing API payloads, database queries, and indexing strategies.",
+            "Deployed and monitored cloud-native services on Azure using Docker and automated CI/CD pipelines."
         ],
         dateRange: "Jun 2024 – Present"
     },
     {
         timelineType: "work",
         name: "Verizon",
-        title: "Senior Frontend Developer",
-        techStack: "React, TypeScript, Redux, Material UI, Node.js, Python, MySQL, MongoDB",
+        title: "Senior Frontend Engineer",
+        techStack:
+            "React, TypeScript, Redux, Material UI, Node.js, Python, MongoDB, MySQL",
         summaryPoints: [
-            "Built enterprise UI modules with React + TypeScript and accessible design patterns.",
-            "Integrated UI with Node/Python APIs and collaborated on API contracts and payloads.",
-            "Implemented responsive UIs and performance optimizations for cross-device support.",
-            "Maintained quality via code reviews, unit tests, and close collaboration with QA."
+            "Developed enterprise-scale React + TypeScript applications supporting high-traffic internal and customer-facing systems.",
+            "Partnered with backend and database teams to design REST APIs, data models, and payload contracts.",
+            "Implemented data-heavy UI workflows including pagination, filtering, sorting, and transformations.",
+            "Worked closely with backend teams on schema evolution and backward-compatible API changes.",
+            "Delivered accessible, responsive UIs while maintaining performance and data consistency.",
+            "Improved UI performance and reliability by optimizing client-side data fetching, caching, and rendering patterns."
         ],
         dateRange: "Feb 2022 – Jun 2024"
     },
     {
         timelineType: "work",
         name: "TechCloudUSA",
-        title: "Frontend Developer",
-        techStack: "React, React Native, TypeScript, Redux, OAuth2, REST APIs",
+        title: "Frontend / Mobile Engineer",
+        techStack:
+            "React, React Native, TypeScript, Redux, REST APIs, OAuth2, SQL, NoSQL",
         summaryPoints: [
-            "Built mobile-first features using React Native and reusable UI components.",
-            "Integrated REST APIs with auth flows using OAuth2 and token-based authorization.",
-            "Improved performance by reducing re-renders and optimizing component structure."
+            "Built React and React Native applications supporting mobile and tablet platforms.",
+            "Integrated REST APIs backed by SQL and NoSQL databases with secure OAuth2 authentication.",
+            "Implemented efficient data-fetching and client-side caching strategies.",
+            "Improved application performance by reducing re-renders and optimizing component lifecycles."
         ],
         dateRange: "Aug 2021 – Feb 2022"
     },
     {
         timelineType: "work",
         name: "Chakravyuha Technologies",
-        title: "Web Developer",
-        techStack: "HTML, CSS, JavaScript, React, Redux, REST APIs, Git",
+        title: "Software Engineer",
+        techStack: "React, JavaScript, HTML, CSS, Redux, REST APIs, SQL, Git",
         summaryPoints: [
-            "Built responsive interfaces across browsers and device sizes.",
-            "Integrated APIs for dynamic data updates and reduced full page reloads.",
-            "Improved UI performance with DOM and CSS optimizations."
+            "Developed responsive web applications with React and modern JavaScript.",
+            "Integrated REST APIs and worked with backend teams to align data contracts.",
+            "Supported database-driven features and ensured consistent data rendering across browsers.",
+            "Optimized UI performance and collaborated with QA to resolve production issues."
         ],
         dateRange: "Jan 2019 – May 2021"
     },
@@ -307,15 +364,19 @@ export const timeline: TimelineItem[] = [
         name: "VTU, India",
         title: "Bachelor’s in Computer Science",
         techStack: "Computer Science",
-        summaryPoints: ["Completed Bachelor’s degree in Computer Science."],
+        summaryPoints: [
+            "Completed coursework in data structures, databases, operating systems, and software engineering."
+        ],
         dateRange: "Dec 2018"
     },
     {
         timelineType: "education",
-        name: "Texas A&M Commerce",
+        name: "Texas A&M University – Commerce",
         title: "Master’s in Business Analytics",
         techStack: "Business Analytics",
-        summaryPoints: ["Completed Master’s degree in Business Analytics."],
+        summaryPoints: [
+            "Focused on data analysis, reporting, and translating business problems into data-driven solutions."
+        ],
         dateRange: "Dec 2022"
     }
 ];

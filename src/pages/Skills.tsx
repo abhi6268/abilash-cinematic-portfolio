@@ -31,7 +31,11 @@ import {
   SiPostman,
   SiJira,
   SiGithubcopilot,
+  SiVite,
+  SiSwagger,
+  SiGithubactions,
 } from "react-icons/si";
+import { VscAzureDevops } from "react-icons/vsc";
 import { Skill } from '../types';
 
 const iconMap: { [key: string]: JSX.Element } = {
@@ -56,6 +60,7 @@ const iconMap: { [key: string]: JSX.Element } = {
   SiFastapi: <SiFastapi />,
   SiDotnet: <SiDotnet />,
   SiGraphql: <SiGraphql />,
+  SiSwagger: <SiSwagger />,
 
   SiMongodb: <SiMongodb />,
   SiMysql: <SiMysql />,
@@ -63,6 +68,9 @@ const iconMap: { [key: string]: JSX.Element } = {
   SiMicrosoftazure: <SiMicrosoftazure />,
   FaDocker: <FaDocker />,
   SiKubernetes: <SiKubernetes />,
+  VscAzureDevops: <VscAzureDevops />,
+  SiGithubactions: <SiGithubactions />,
+  SiVite: <SiVite />,
 
   SiJest: <SiJest />,
   SiMocha: <SiMocha />,
