@@ -1,3 +1,6 @@
+import type { LucideIcon } from "lucide-react";
+import { Sparkles, Layers, Cpu } from "lucide-react";
+
 export interface Project {
     id: string;
     title: string;
@@ -65,10 +68,14 @@ export const PROJECTS: Project[] = [
     },
 ];
 
-export const PROJECT_CATEGORIES = [
-    { id: 'featured', label: 'Featured Projects', icon: '⭐' },
-    { id: 'engineering', label: 'Engineering', icon: '⚙️' },
-    { id: 'ai-ml', label: 'AI & Machine Learning', icon: '🤖' },
+export const PROJECT_CATEGORIES: Array<{
+    id: "featured" | "engineering" | "ai-ml";
+    label: string;
+    icon: LucideIcon;
+}> = [
+    { id: "featured", label: "Selected Work", icon: Sparkles },
+    { id: "engineering", label: "Systems Engineering", icon: Layers },
+    { id: "ai-ml", label: "AI & Data Systems", icon: Cpu },
 ];
 
 export const TECH_COLORS: Record<string, string> = {

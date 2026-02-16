@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./ContinueWatching.css";
 import { ProfileType } from "../types";
@@ -44,25 +44,29 @@ const continueWatchingConfig: Record<ProfileType, Omit<Item, "progress">[]> = {
     { title: "Music", posterSrc: "/posters/music.png", link: "/music" },
     { title: "Contact Me", posterSrc: "/posters/contact-me.png", link: "/contact-me" },
   ],
-
   researcher: [
     { title: "Behind the Scenes", posterSrc: "/posters/behind-scenes.png", link: "/behind-the-scenes" },
     { title: "Work Experience", posterSrc: "/posters/experience.jpg", link: "/work-experience" },
     { title: "Skills", posterSrc: "/posters/skills.jpg", link: "/skills" },
     { title: "Contact Me", posterSrc: "/posters/contact-me.png", link: "/contact-me" },
   ],
-
   explorer: [
     { title: "Music", posterSrc: "/posters/music.png", link: "/music" },
     { title: "Projects", posterSrc: "/posters/projects.jpg", link: "/projects" },
     { title: "Work Stories", posterSrc: "/posters/work-stories.png", link: "/work-stories" },
     { title: "Contact Me", posterSrc: "/posters/contact-me.png", link: "/contact-me" },
   ],
-
 };
 
 const ContinueWatching: React.FC<ContinueWatchingProps> = ({ profile }) => {
   const navigate = useNavigate();
+
+  // Track loaded images
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+
+  // Track visible cards (for lazy loading)
+  const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set());
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
   const items: Item[] = useMemo(() => {
     return continueWatchingConfig[profile].map((x) => ({
@@ -71,37 +75,85 @@ const ContinueWatching: React.FC<ContinueWatchingProps> = ({ profile }) => {
     }));
   }, [profile]);
 
+  // Setup Intersection Observer for lazy loading
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const index = parseInt(entry.target.getAttribute('data-index') || '0');
+            if (entry.isIntersecting) {
+              setVisibleCards((prev) => new Set(prev).add(index));
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    return () => observerRef.current?.disconnect();
+  }, []);
+
+  // Observe cards when they mount
+  useEffect(() => {
+    const cards = document.querySelectorAll('.cw-card');
+    cards.forEach((card) => {
+      observerRef.current?.observe(card);
+    });
+  }, [items]);
+
+  const handleImageLoad = (src: string) => {
+    setLoadedImages((prev) => new Set(prev).add(src));
+  };
+
   return (
       <div className="cw-row">
         <h2 className="cw-title">Continue Watching for {profile}</h2>
 
         <div className="cw-track">
-          {items.map((item) => (
-              <div
-                  key={item.title}
-                  className="cw-card"
-                  onClick={() => navigate(item.link)}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") navigate(item.link);
-                  }}
-              >
-                <img className="cw-poster" src={item.posterSrc} alt={item.title} />
+          {items.map((item, index) => {
+            const isLoaded = loadedImages.has(item.posterSrc);
+            const isVisible = visibleCards.has(index);
 
-                <div className="cw-overlay">
-                  <div className="cw-play" aria-hidden="true">▶</div>
-                  <div className="cw-label">{item.title}</div>
-                </div>
+            return (
+                <div
+                    key={item.title}
+                    data-index={index}
+                    className={`cw-card ${isLoaded ? 'loaded' : 'loading'}`}
+                    onClick={() => navigate(item.link)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") navigate(item.link);
+                    }}
+                >
+                  {/* Skeleton loader */}
+                  {!isLoaded && <div className="cw-skeleton" />}
 
-                <div className="cw-progress">
-                  <div
-                      className="cw-progressFill"
-                      style={{ width: `${Math.round(clamp01(item.progress) * 100)}%` }}
-                  />
+                  {/* Poster with lazy loading */}
+                  {isVisible && (
+                      <img
+                          className="cw-poster"
+                          src={item.posterSrc}
+                          alt={item.title}
+                          loading="lazy"
+                          onLoad={() => handleImageLoad(item.posterSrc)}
+                          style={{ opacity: isLoaded ? 1 : 0 }}
+                      />
+                  )}
+
+                  <div className="cw-overlay">
+                    <div className="cw-play" aria-hidden="true">▶</div>
+                    <div className="cw-label">{item.title}</div>
+                  </div>
+
+                  <div className="cw-progress">
+                    <div
+                        className="cw-progressFill"
+                        style={{ width: `${Math.round(clamp01(item.progress) * 100)}%` }}
+                    />
+                  </div>
                 </div>
-              </div>
-          ))}
+            );
+          })}
         </div>
       </div>
   );

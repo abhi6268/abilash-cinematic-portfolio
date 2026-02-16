@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import "./TopPicksRow.css";
 import {
@@ -24,7 +24,7 @@ type Pick = {
   icon: JSX.Element;
   posterSrc: string;
   videoSrc: string;
-  progress?: number; // 0 to 1
+  progress?: number;
 };
 
 const topPicksConfig: Record<ProfileType, Pick[]> = {
@@ -32,7 +32,6 @@ const topPicksConfig: Record<ProfileType, Pick[]> = {
     { title: "Work Permit", icon: <FaPassport />, route: "/work-permit", posterSrc: "/posters/work-permit.jpg", videoSrc: "/videos/work-permit.mp4", progress: 0.9 },
     { title: "Skills", icon: <FaCode />, route: "/skills", posterSrc: "/posters/skills.jpg", videoSrc: "/videos/skills.mp4", progress: 0.65 },
     { title: "Experience", icon: <FaBriefcase />, route: "/work-experience", posterSrc: "/posters/experience.jpg", videoSrc: "/videos/experience.mp4", progress: 0.5 },
-    // { title: "Certifications", icon: <FaCertificate />, route: "/certifications", posterSrc: "/posters/certifications.jpg", videoSrc: "/videos/certifications.mp4", progress: 0.35 },
     { title: "Recommendations", icon: <FaHandsHelping />, route: "/recommendations", posterSrc: "/posters/recommendations.jpg", videoSrc: "/videos/recommendations.mp4", progress: 0.25 },
     { title: "Projects", icon: <FaProjectDiagram />, route: "/projects", posterSrc: "/posters/projects.jpg", videoSrc: "/videos/projects.mp4", progress: 0.4 },
     { title: "Contact Me", icon: <FaEnvelope />, route: "/contact-me", posterSrc: "/posters/contact-me.jpg", videoSrc: "/videos/contact-me.mp4", progress: 0.15 },
@@ -63,6 +62,42 @@ const topPicksConfig: Record<ProfileType, Pick[]> = {
 const TopPicksRow: React.FC<TopPicksRowProps> = ({ profile }) => {
   const navigate = useNavigate();
   const topPicks = topPicksConfig[profile];
+
+  // Track which images have loaded
+  const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set());
+
+  // Track which cards are in viewport (for lazy loading videos)
+  const [visibleCards, setVisibleCards] = useState<Set<number>>(new Set());
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  // Setup Intersection Observer for lazy loading
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const index = parseInt(entry.target.getAttribute('data-index') || '0');
+            if (entry.isIntersecting) {
+              setVisibleCards((prev) => new Set(prev).add(index));
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    return () => observerRef.current?.disconnect();
+  }, []);
+
+  // Observe cards when they mount
+  useEffect(() => {
+    const cards = document.querySelectorAll('.pick-card');
+    cards.forEach((card) => {
+      observerRef.current?.observe(card);
+    });
+  }, [topPicks]);
+
+  const handleImageLoad = (src: string) => {
+    setLoadedImages((prev) => new Set(prev).add(src));
+  };
 
   const play = (card: HTMLDivElement) => {
     const v = card.querySelector("video") as HTMLVideoElement | null;
@@ -100,39 +135,52 @@ const TopPicksRow: React.FC<TopPicksRowProps> = ({ profile }) => {
         <h2 className="row-title">Today's Top Picks for {profile}</h2>
 
         <div className="card-row">
-          {topPicks.map((pick, index) => (
-              <div
-                  key={index}
-                  className="pick-card"
-                  onClick={() => navigate(pick.route)}
-                  style={{ animationDelay: `${index * 0.2}s` }}
-                  onMouseEnter={(e) => playDelayed(e.currentTarget)}
-                  onMouseLeave={(e) => stopImmediate(e.currentTarget)}
-              >
-                <img src={pick.posterSrc} alt={pick.title} className="pick-poster" />
+          {topPicks.map((pick, index) => {
+            const isImageLoaded = loadedImages.has(pick.posterSrc);
+            const isVisible = visibleCards.has(index);
 
-                <video
-                    className="pick-video"
-                    src={pick.videoSrc}
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                />
+            return (
+                <div
+                    key={index}
+                    data-index={index}
+                    className={`pick-card ${isImageLoaded ? 'loaded' : 'loading'}`}
+                    onClick={() => navigate(pick.route)}
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                    onMouseEnter={(e) => isImageLoaded && playDelayed(e.currentTarget)}
+                    onMouseLeave={(e) => stopImmediate(e.currentTarget)}
+                >
+                  {/* Skeleton loader */}
+                  {!isImageLoaded && <div className="pick-skeleton" />}
 
-                <div className="pick-overlay">
-                  <div className="pick-icon">{pick.icon}</div>
-                  <div className="pick-label">{pick.title}</div>
+                  {/* Poster image with lazy loading */}
+                  <img
+                      src={pick.posterSrc}
+                      alt={pick.title}
+                      className="pick-poster"
+                      loading="lazy"
+                      onLoad={() => handleImageLoad(pick.posterSrc)}
+                      style={{ opacity: isImageLoaded ? 1 : 0 }}
+                  />
+
+                  {/* Video only loads when card is in viewport and image is loaded */}
+                  {isVisible && isImageLoaded && (
+                      <video
+                          className="pick-video"
+                          src={pick.videoSrc}
+                          muted
+                          loop
+                          playsInline
+                          preload="none"
+                      />
+                  )}
+
+                  <div className="pick-overlay">
+                    <div className="pick-icon">{pick.icon}</div>
+                    <div className="pick-label">{pick.title}</div>
+                  </div>
                 </div>
-
-                {/*<div className="pick-progress">*/}
-                {/*  <div*/}
-                {/*      className="pick-progress-fill"*/}
-                {/*      style={{ width: `${Math.max(0, Math.min(1, pick.progress ?? 0)) * 100}%` }}*/}
-                {/*  />*/}
-                {/*</div>*/}
-              </div>
-          ))}
+            );
+          })}
         </div>
       </div>
   );

@@ -6,6 +6,18 @@
 .cw-title {
   font-size: 2.3rem;
   margin: 0 0 14px;
+  animation: fadeInTitle 0.6s ease-out;
+}
+
+@keyframes fadeInTitle {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .cw-track {
@@ -31,15 +43,72 @@
   overflow: hidden;
   cursor: pointer;
 
-  background: #141414;
+  background: #1a1a1a;
   border: 1px solid rgba(255,255,255,0.10);
   box-shadow: 0 16px 50px rgba(0,0,0,0.55);
 
   will-change: transform;
   transform: translate3d(0,0,0);
   transition: transform 170ms ease, box-shadow 170ms ease, border-color 170ms ease;
+
+  /* Progressive loading animation */
+  opacity: 0;
+  animation: cwCardSlideIn 0.5s ease-out forwards;
+  animation-delay: calc(var(--card-index, 0) * 0.1s);
 }
 
+@keyframes cwCardSlideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Add animation delays via nth-child */
+.cw-card:nth-child(1) { animation-delay: 0.1s; }
+.cw-card:nth-child(2) { animation-delay: 0.2s; }
+.cw-card:nth-child(3) { animation-delay: 0.3s; }
+.cw-card:nth-child(4) { animation-delay: 0.4s; }
+
+/* Loading state */
+.cw-card.loading {
+  pointer-events: none;
+}
+
+.cw-card.loaded {
+  animation: none;
+  opacity: 1;
+}
+
+/* Skeleton Loader */
+.cw-skeleton {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.03) 0%,
+          rgba(255, 255, 255, 0.08) 50%,
+          rgba(255, 255, 255, 0.03) 100%
+  );
+  background-size: 200% 100%;
+  animation: cwShimmer 1.5s infinite;
+  z-index: 1;
+}
+
+@keyframes cwShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Hover effect */
 .cw-card:hover {
   transform: scale(1.035);
   z-index: 25;
@@ -58,6 +127,12 @@
   object-fit: cover;
   transform: translateZ(0);
   filter: brightness(0.75) contrast(1.1);
+  transition: opacity 0.3s ease, filter 0.2s ease;
+  z-index: 2;
+}
+
+.cw-card:hover .cw-poster {
+  filter: brightness(0.85) contrast(1.15);
 }
 
 .cw-overlay {
@@ -67,6 +142,8 @@
   place-items: center;
   gap: 10px;
   background: radial-gradient(transparent 22%, rgba(0,0,0,0.78));
+  z-index: 3;
+  pointer-events: none;
 }
 
 .cw-label {
@@ -74,6 +151,11 @@
   font-weight: 900;
   letter-spacing: 0.2px;
   text-shadow: 0 10px 26px rgba(0,0,0,0.75);
+  transition: transform 0.2s ease;
+}
+
+.cw-card:hover .cw-label {
+  transform: translateY(-4px);
 }
 
 .cw-play {
@@ -109,11 +191,56 @@
   border-radius: 999px;
   background: rgba(255,255,255,0.16);
   overflow: hidden;
+  z-index: 4;
 }
 
 .cw-progressFill {
   height: 100%;
   border-radius: 999px;
   background: #e50914;
+  transition: width 0.3s ease;
 }
 
+
+@media (max-width: 768px) {
+  .cw-card {
+    width: 400px;
+    height: 180px;
+  }
+
+  .cw-label {
+    font-size: 42px;
+  }
+
+  .cw-play {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (max-width: 480px) {
+  .cw-card {
+    width: 320px;
+    height: 150px;
+  }
+
+  .cw-label {
+    font-size: 32px;
+  }
+
+  .cw-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cw-card,
+  .cw-skeleton,
+  .cw-title {
+    animation: none !important;
+  }
+
+  .cw-card {
+    opacity: 1;
+  }
+}

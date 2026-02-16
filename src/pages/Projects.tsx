@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Projects.css";
 import { PROJECTS, PROJECT_CATEGORIES, TECH_COLORS } from "../data/projectsData";
+import { Sparkles } from "lucide-react";
 
 const Projects: React.FC = () => {
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const Projects: React.FC = () => {
               <div className="projects-hero-overlay" />
               <div className="projects-hero-content">
                 <div className="projects-badge">
-                  <span className="badge-icon">⭐</span>
+                  <Sparkles className="badge-icon" size={14} strokeWidth={1.75} />
                   Featured Project
                 </div>
 
@@ -93,7 +94,10 @@ const Projects: React.FC = () => {
             category.projects.length > 0 && (
                 <div key={category.id} className="projects-row">
                   <h2 className="row-title">
-                    <span className="row-icon">{category.icon}</span>
+                    {(() => {
+                      const Icon = category.icon;
+                      return <Icon className="row-icon" size={18} strokeWidth={1.75} />;
+                    })()}
                     {category.label}
                   </h2>
 
@@ -112,11 +116,12 @@ const Projects: React.FC = () => {
                             <div className="card-gradient" style={{ background: project.gradient }} />
 
                             <div className="card-status">
-                      <span className={`status-badge ${project.status}`}>
-                        {project.status === 'live' ? '🟢 Live' :
-                            project.status === 'development' ? '🟡 In Development' :
-                                '⚪ Archived'}
-                      </span>
+                              <span className={`status-dot ${project.status}`} aria-hidden="true" />
+                              {project.status === "live"
+                                  ? "Live"
+                                  : project.status === "development"
+                                      ? "In Development"
+                                      : "Archived"}
                             </div>
                           </div>
 

@@ -30,35 +30,15 @@ const ProfilePage: React.FC<Props> = ({ setTransitionOn }) => {
         ? (profileName as ProfileType)
         : "recruiter";
 
-    // Prefer backgroundGif passed from Browse state, fallback to BG_BY_PROFILE map
     const backgroundGif = useMemo(() => {
         const state = location.state as { backgroundGif?: string } | null;
         return state?.backgroundGif || BG_BY_PROFILE[profile];
     }, [location.state, profile]);
 
-    // Hide overlay only after the bg image is loaded + painted
+    // Hide transition overlay immediately - don't wait for anything
     useEffect(() => {
-        let cancelled = false;
-
-        const img = new Image();
-        img.src = backgroundGif;
-
-        const done = () => {
-            // wait 2 frames so the background style is painted
-            requestAnimationFrame(() => {
-                requestAnimationFrame(() => {
-                    if (!cancelled) setTransitionOn(false);
-                });
-            });
-        };
-
-        img.onload = done;
-        img.onerror = done;
-
-        return () => {
-            cancelled = true;
-        };
-    }, [backgroundGif, setTransitionOn]);
+        setTransitionOn(false);
+    }, [setTransitionOn]);
 
     return (
         <>

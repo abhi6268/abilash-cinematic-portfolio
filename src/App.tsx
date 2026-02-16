@@ -17,6 +17,7 @@ import BehindTheScenes from "./pages/BehindTheScenes";
 import WorkStories from "./pages/WorkStories";
 import ScrollToTop from "./components/ScrollToTop";
 import { Analytics } from "@vercel/analytics/react";
+import WorkExperience from "./pages/WorkExperience";
 
 
 const App: React.FC = () => {
@@ -37,7 +38,7 @@ const App: React.FC = () => {
           }
       />
       <Route path="/work-permit" element={<Layout><WorkPermit /></Layout>} />
-      <Route path="/work-experience" element={<Layout><Timeline /></Layout>} />
+      <Route path="/work-experience" element={<Layout><WorkExperience /></Layout>} />
       <Route path="/recommendations" element={<Layout><Recommendations /></Layout>} />
       <Route path="/skills" element={<Layout><Skills /></Layout>} />
       <Route path="/projects" element={<Layout><Projects /></Layout>} />
