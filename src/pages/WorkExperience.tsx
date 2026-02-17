@@ -4,6 +4,8 @@ import { WORK_EXPERIENCE, EDUCATION } from '../data/getWorkExperienceData';
 
 const WorkExperience: React.FC = () => {
     const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
+    const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+    const [expandedTechStacks, setExpandedTechStacks] = useState<Set<string>>(new Set());
     const observerRef = useRef<IntersectionObserver | null>(null);
 
     useEffect(() => {
@@ -27,6 +29,30 @@ const WorkExperience: React.FC = () => {
             observerRef.current?.observe(card);
         });
     }, []);
+
+    const toggleExpanded = (jobId: string) => {
+        setExpandedCards((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(jobId)) {
+                newSet.delete(jobId);
+            } else {
+                newSet.add(jobId);
+            }
+            return newSet;
+        });
+    };
+
+    const toggleTechStack = (jobId: string) => {
+        setExpandedTechStacks((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(jobId)) {
+                newSet.delete(jobId);
+            } else {
+                newSet.add(jobId);
+            }
+            return newSet;
+        });
+    };
 
     return (
         <div className="work-experience-page">
@@ -69,73 +95,103 @@ const WorkExperience: React.FC = () => {
                     <div className="timeline-line" />
                 </div>
 
-                {WORK_EXPERIENCE.map((job, index) => (
-                    <article
-                        key={job.id}
-                        id={`card-${job.id}`}
-                        className={`experience-card ${job.isFeatured ? 'featured' : ''} ${
-                            visibleCards.has(`card-${job.id}`) ? 'visible' : ''
-                        }`}
-                        style={{ '--accent-color': job.color } as React.CSSProperties}
-                    >
-                        {/* Card Header */}
-                        <div className="card-header">
-                            <div className="card-header-left">
-                                <div className="card-date">{job.dateRange}</div>
-                                {job.isCurrent && <div className="current-badge">Current Role</div>}
-                                {job.isFeatured && !job.isCurrent && <div className="featured-badge">Featured</div>}
-                            </div>
-                            <div className="card-index">{String(index + 1).padStart(2, '0')}</div>
-                        </div>
+                {WORK_EXPERIENCE.map((job, index) => {
+                    const isExpanded = expandedCards.has(job.id);
+                    const isTechExpanded = expandedTechStacks.has(job.id);
+                    const displayedHighlights = isExpanded ? job.highlights : job.highlights.slice(0, 6);
+                    const displayedTech = isTechExpanded ? job.techStack : job.techStack.slice(0, 8);
 
-                        {/* Card Content */}
-                        <div className="card-content" style={{ background: job.gradient }}>
-                            <div className="card-company">{job.company}</div>
-                            <h3 className="card-title">{job.title}</h3>
-                            <div className="card-location">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                                </svg>
-                                {job.location}
+                    return (
+                        <article
+                            key={job.id}
+                            id={`card-${job.id}`}
+                            className={`experience-card ${job.isFeatured ? 'featured' : ''} ${
+                                visibleCards.has(`card-${job.id}`) ? 'visible' : ''
+                            }`}
+                            style={{ '--accent-color': job.color } as React.CSSProperties}
+                        >
+                            {/* Card Header */}
+                            <div className="card-header">
+                                <div className="card-header-left">
+                                    <div className="card-date">{job.dateRange}</div>
+                                    {job.isCurrent && <div className="current-badge">Current Role</div>}
+                                    {job.isFeatured && !job.isCurrent && <div className="featured-badge">Featured</div>}
+                                </div>
+                                <div className="card-index">{String(index + 1).padStart(2, '0')}</div>
                             </div>
 
-                            {/* Tech Stack */}
-                            <div className="card-tech-stack">
-                                {job.techStack.slice(0, 8).map((tech) => (
-                                    <span key={tech} className="tech-chip">
-                    {tech}
-                  </span>
-                                ))}
-                                {job.techStack.length > 8 && (
-                                    <span className="tech-more">+{job.techStack.length - 8} more</span>
-                                )}
-                            </div>
+                            {/* Card Content */}
+                            <div className="card-content" style={{ background: job.gradient }}>
+                                <div className="card-company">{job.company}</div>
+                                <h3 className="card-title">{job.title}</h3>
+                                <div className="card-location">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                    </svg>
+                                    {job.location}
+                                </div>
 
-                            {/* Highlights */}
-                            <div className="card-highlights">
-                                <h4 className="highlights-title">Key Achievements</h4>
-                                <ul className="highlights-list">
-                                    {job.highlights.slice(0, 6).map((highlight, idx) => (
-                                        <li key={idx} className="highlight-item">
-                                            <svg className="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                                            </svg>
-                                            <span>{highlight}</span>
-                                        </li>
+                                {/* Tech Stack */}
+                                <div className="card-tech-stack">
+                                    {displayedTech.map((tech) => (
+                                        <span key={tech} className="tech-chip">
+                                            {tech}
+                                        </span>
                                     ))}
-                                </ul>
-                                {job.highlights.length > 6 && (
-                                    <button className="show-more-btn">
-                                        View {job.highlights.length - 6} more achievements
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                                            <path d="M7 10l5 5 5-5z"/>
-                                        </svg>
-                                    </button>
-                                )}
+                                    {job.techStack.length > 8 && (
+                                        <button
+                                            className="tech-more"
+                                            onClick={() => toggleTechStack(job.id)}
+                                        >
+                                            {isTechExpanded
+                                                ? 'Show less'
+                                                : `+${job.techStack.length - 8} more`
+                                            }
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Highlights */}
+                                <div className="card-highlights">
+                                    <h4 className="highlights-title">Key Achievements</h4>
+                                    <ul className="highlights-list">
+                                        {displayedHighlights.map((highlight, idx) => (
+                                            <li key={idx} className="highlight-item">
+                                                <svg className="check-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                                </svg>
+                                                <span>{highlight}</span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                    {job.highlights.length > 6 && (
+                                        <button
+                                            className="show-more-btn"
+                                            onClick={() => toggleExpanded(job.id)}
+                                        >
+                                            {isExpanded
+                                                ? 'Show less'
+                                                : `View ${job.highlights.length - 6} more achievements`
+                                            }
+                                            <svg
+                                                width="16"
+                                                height="16"
+                                                viewBox="0 0 24 24"
+                                                fill="currentColor"
+                                                style={{
+                                                    transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                                                    transition: 'transform 0.3s ease'
+                                                }}
+                                            >
+                                                <path d="M7 10l5 5 5-5z"/>
+                                            </svg>
+                                        </button>
+                                    )}
+                                </div>
                             </div>
-                        </div>
-                    </article>
-                ))}
+                        </article>
+                    );
+                })}
             </section>
 
             {/* Education Section */}

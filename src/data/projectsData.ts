@@ -74,8 +74,8 @@ export const PROJECT_CATEGORIES: Array<{
     icon: LucideIcon;
 }> = [
     { id: "featured", label: "Selected Work", icon: Sparkles },
-    { id: "engineering", label: "Systems Engineering", icon: Layers },
     { id: "ai-ml", label: "AI & Data Systems", icon: Cpu },
+    { id: "engineering", label: "Systems Engineering", icon: Layers },
 ];
 
 export const TECH_COLORS: Record<string, string> = {

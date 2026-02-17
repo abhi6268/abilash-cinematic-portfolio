@@ -5,25 +5,27 @@ type ViewMode = "grid" | "spotlight";
 
 type Rec = {
   id: string;
-  displayName: string; // keep anonymous
-  title: string; // "Former Manager"
-  verifiedRole: string; // "Engineering Manager"
-  org: string; // "Enterprise SaaS Platform"
-  year: string; // "2023"
-  relationship: string; // "Direct manager"
+  displayName: string;
+  title: string;
+  verifiedRole: string;
+  org: string;
+  year: string;
+  relationship: string;
   bullets: string[];
   quote: string;
+  photo?: string;
 };
 
 const RECS: Rec[] = [
   {
     id: "mgr",
-    displayName: "Anonymous",
-    title: "Former Manager",
-    verifiedRole: "Engineering Manager",
+    displayName: "Surya Rao",
+    title: "Former Director",
+    verifiedRole: "Head of the Enterprise - Director",
     org: "Enterprise SaaS Platform",
-    year: "2023",
+    year: "2025",
     relationship: "Direct manager",
+    photo: "/posters/recommendation-Surya.jpeg",
     bullets: [
       "Consistently shipped UI features under tight deadlines without regressions.",
       "Drove clean component architecture and improved performance on critical flows.",
@@ -66,37 +68,47 @@ const RECS: Rec[] = [
   },
 ];
 
-const FADE_MS = 260;
-const AUTO_MS = 6000;
+const FADE_MS = 400;
+const AUTO_MS = 7000;
 
 const Recommendations: React.FC = () => {
   const [view, setView] = useState<ViewMode>("grid");
-
-  // Spotlight state
   const [activeIndex, setActiveIndex] = useState(0);
-
-  // Crossfade support
   const [prevIndex, setPrevIndex] = useState<number | null>(null);
   const [isFading, setIsFading] = useState(false);
-
-  // Expand/collapse state
-  const [expandedId, setExpandedId] = useState<string | null>(RECS[0]?.id ?? null);
-
-  // Autoplay pause (hover)
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [visibleCards, setVisibleCards] = useState<Set<string>>(new Set());
 
   const active = useMemo(() => RECS[activeIndex], [activeIndex]);
   const prevRec = useMemo(() => (prevIndex !== null ? RECS[prevIndex] : null), [prevIndex]);
 
+  // Intersection Observer for fade-in animations
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setVisibleCards((prev) => new Set(prev).add(entry.target.id));
+            }
+          });
+        },
+        { threshold: 0.1, rootMargin: '50px' }
+    );
+
+    const cards = document.querySelectorAll('.rec-card');
+    cards.forEach((card) => observer.observe(card));
+
+    return () => observer.disconnect();
+  }, [view]);
+
   const goTo = (i: number) => {
     if (i === activeIndex) return;
-
     setPrevIndex(activeIndex);
     setActiveIndex(i);
     setExpandedId(RECS[i].id);
-
     setIsFading(true);
-    window.setTimeout(() => {
+    setTimeout(() => {
       setPrevIndex(null);
       setIsFading(false);
     }, FADE_MS);
@@ -109,236 +121,317 @@ const Recommendations: React.FC = () => {
     setExpandedId((cur) => (cur === id ? null : id));
   };
 
-  // Keyboard left/right for spotlight
+  // Keyboard navigation
   useEffect(() => {
     if (view !== "spotlight") return;
-
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") next();
       if (e.key === "ArrowLeft") prev();
     };
-
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, activeIndex]);
 
-  // Autoplay spotlight every 6s, pause on hover
+  // Autoplay
   useEffect(() => {
-    if (view !== "spotlight") return;
-    if (isPaused) return;
-
-    const id = window.setInterval(() => next(), AUTO_MS);
-    return () => window.clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (view !== "spotlight" || isPaused) return;
+    const id = setInterval(next, AUTO_MS);
+    return () => clearInterval(id);
   }, [view, activeIndex, isPaused]);
 
   const SpotlightCard = ({ rec }: { rec: Rec }) => {
     const open = expandedId === rec.id;
 
     return (
-        <article className="recs-card open spotlight">
-          <div className="recs-cardTop">
-            <div className="recs-avatar" aria-hidden="true">
-              <span className="recs-avatarIcon">👤</span>
+        <article className="rec-card rec-spotlight-card">
+          <div className="rec-header">
+            <div className="rec-avatar-wrapper">
+              <div className="rec-avatar">
+                {rec.photo ? (
+                    <img
+                        src={rec.photo}
+                        alt={rec.displayName}
+                        className="rec-avatar-img"
+                        loading="lazy"
+                    />
+                ) : (
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                    </svg>
+                )}
+              </div>
+              <div className="rec-verified-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z"/>
+                </svg>
+                Verified
+              </div>
             </div>
 
-            <div className="recs-meta">
-              <div className="recs-nameRow">
-                <h3 className="recs-name">
-                  {rec.displayName} <span className="recs-muted">({rec.title})</span>
-                </h3>
-
-                <button
-                    type="button"
-                    className="recs-expandBtn"
-                    onClick={() => toggleExpanded(rec.id)}
-                    aria-expanded={open}
-                    aria-label={open ? "Collapse recommendation" : "Expand recommendation"}
-                >
-                  {open ? "−" : "+"}
-                </button>
-              </div>
-
-              <div className="recs-badgeRow">
-              <span className="recs-verifiedBadge" title="Verified by role">
-                <span className="recs-verifiedDot" aria-hidden="true" />
-                Verified by role: <b>{rec.verifiedRole}</b>
-              </span>
-              </div>
-
-              <div className="recs-submeta">
+            <div className="rec-meta">
+              <h3 className="rec-name">
+                {rec.displayName}
+                <span className="rec-role-tag">{rec.title}</span>
+              </h3>
+              <div className="rec-info">
+                <span className="rec-verified-role">{rec.verifiedRole}</span>
+                <span className="rec-separator">•</span>
                 <span>{rec.org}</span>
-                <span className="recs-dotSep">•</span>
-                <span>{rec.year}</span>
-                <span className="recs-dotSep">•</span>
-                <span className="recs-muted">{rec.relationship}</span>
+                <span className="rec-separator">•</span>
+                <span className="rec-year">{rec.year}</span>
               </div>
+              <div className="rec-relationship">{rec.relationship}</div>
             </div>
           </div>
 
-          <ul className="recs-bullets">
-            {rec.bullets.map((b) => (
-                <li key={b}>{b}</li>
-            ))}
-          </ul>
+          <div className="rec-content">
+            <h4 className="rec-section-title">Key Contributions</h4>
+            <ul className="rec-bullets">
+              {rec.bullets.map((b, idx) => (
+                  <li key={idx}>
+                    <svg className="rec-check" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                    <span>{b}</span>
+                  </li>
+              ))}
+            </ul>
 
-          <div className={`recs-quoteWrap ${open ? "show" : ""}`}>
-            <blockquote className="recs-quote">“{rec.quote}”</blockquote>
+            <div className={`rec-quote-wrapper ${open ? 'expanded' : ''}`}>
+              <button
+                  className="rec-expand-btn"
+                  onClick={() => toggleExpanded(rec.id)}
+              >
+                <span>{open ? 'Hide' : 'Read'} Full Recommendation</span>
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                    style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                >
+                  <path d="M7 10l5 5 5-5z"/>
+                </svg>
+              </button>
+              <blockquote className="rec-quote">
+                <svg className="quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" opacity="0.3">
+                  <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+                </svg>
+                {rec.quote}
+              </blockquote>
+            </div>
           </div>
         </article>
     );
   };
 
   return (
-      <div className="recs-page">
-        {/* Page header */}
-        <div className="recs-header">
-          <h1 className="recs-title">Recommendations</h1>
-          <p className="recs-subtitle">
-            Feedback from people I’ve worked closely with across engineering and product teams.
-          </p>
+      <div className="recommendations-page">
+        {/* Hero Section */}
+        <section className="rec-hero">
+          <div className="hero-grain" />
+          <div className="rec-hero-content">
+            <div className="rec-hero-kicker">What Others Say</div>
+            <h1 className="rec-hero-title">
+              Trusted By
+              <span className="rec-hero-accent"> Industry Leaders</span>
+            </h1>
+            <p className="rec-hero-description">
+              Feedback from engineering managers, product partners, and technical leads
+              I've collaborated with across multiple organizations and high-impact projects.
+            </p>
 
-          <div className="recs-toggle">
-            <button
-                type="button"
-                className={`recs-pill ${view === "grid" ? "active" : ""}`}
-                onClick={() => setView("grid")}
-            >
-              Grid
-            </button>
-            <button
-                type="button"
-                className={`recs-pill ${view === "spotlight" ? "active" : ""}`}
-                onClick={() => setView("spotlight")}
-            >
-              Spotlight
-            </button>
-          </div>
-        </div>
-
-        {/* GRID VIEW */}
-        {view === "grid" && (
-            <div className="recs-grid">
-              {RECS.map((r, idx) => {
-                const open = expandedId === r.id;
-                return (
-                    <article
-                        key={r.id}
-                        className={`recs-card ${open ? "open" : ""}`}
-                        style={{ animationDelay: `${0.08 + idx * 0.08}s` }}
-                    >
-                      <div className="recs-cardTop">
-                        <div className="recs-avatar" aria-hidden="true">
-                          <span className="recs-avatarIcon">👤</span>
-                        </div>
-
-                        <div className="recs-meta">
-                          <div className="recs-nameRow">
-                            <h3 className="recs-name">
-                              {r.displayName} <span className="recs-muted">({r.title})</span>
-                            </h3>
-
-                            <button
-                                type="button"
-                                className="recs-expandBtn"
-                                onClick={() => toggleExpanded(r.id)}
-                                aria-expanded={open}
-                                aria-label={open ? "Collapse recommendation" : "Expand recommendation"}
-                            >
-                              {open ? "−" : "+"}
-                            </button>
-                          </div>
-
-                          <div className="recs-badgeRow">
-                      <span className="recs-verifiedBadge" title="Verified by role">
-                        <span className="recs-verifiedDot" aria-hidden="true" />
-                        Verified by role: <b>{r.verifiedRole}</b>
-                      </span>
-                          </div>
-
-                          <div className="recs-submeta">
-                            <span>{r.org}</span>
-                            <span className="recs-dotSep">•</span>
-                            <span>{r.year}</span>
-                            <span className="recs-dotSep">•</span>
-                            <span className="recs-muted">{r.relationship}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      <ul className="recs-bullets">
-                        {r.bullets.map((b) => (
-                            <li key={b}>{b}</li>
-                        ))}
-                      </ul>
-
-                      {/* Expandable quote */}
-                      <div className={`recs-quoteWrap ${open ? "show" : ""}`}>
-                        <blockquote className="recs-quote">“{r.quote}”</blockquote>
-                      </div>
-                    </article>
-                );
-              })}
+            <div className="rec-view-toggle">
+              <button
+                  className={`rec-toggle-btn ${view === "grid" ? "active" : ""}`}
+                  onClick={() => setView("grid")}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M4 4h7v7H4V4zm0 9h7v7H4v-7zm9-9h7v7h-7V4zm0 9h7v7h-7v-7z"/>
+                </svg>
+                Grid View
+              </button>
+              <button
+                  className={`rec-toggle-btn ${view === "spotlight" ? "active" : ""}`}
+                  onClick={() => setView("spotlight")}
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+                Spotlight
+              </button>
             </div>
+          </div>
+        </section>
+
+        {/* Grid View */}
+        {view === "grid" && (
+            <section className="rec-grid-section">
+              <div className="rec-grid">
+                {RECS.map((rec, idx) => {
+                  const open = expandedId === rec.id;
+                  return (
+                      <article
+                          key={rec.id}
+                          id={`rec-${rec.id}`}
+                          className={`rec-card ${visibleCards.has(`rec-${rec.id}`) ? 'visible' : ''}`}
+                          style={{ '--card-index': idx } as React.CSSProperties}
+                      >
+                        <div className="rec-header">
+                          <div className="rec-avatar-wrapper">
+                            <div className="rec-avatar">
+                              {rec.photo ? (
+                                  <img
+                                      src={rec.photo}
+                                      alt={rec.displayName}
+                                      className="rec-avatar-img"
+                                      loading="lazy"
+                                  />
+                              ) : (
+                                  <svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                  </svg>
+                              )}
+                            </div>
+                            <div className="rec-verified-badge">
+                              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2L9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2z"/>
+                              </svg>
+                              Verified
+                            </div>
+                          </div>
+
+                          <div className="rec-meta">
+                            <h3 className="rec-name">
+                              {rec.displayName}
+                              <span className="rec-role-tag">{rec.title}</span>
+                            </h3>
+                            <div className="rec-info">
+                              <span className="rec-verified-role">{rec.verifiedRole}</span>
+                              <span className="rec-separator">•</span>
+                              <span>{rec.org}</span>
+                              <span className="rec-separator">•</span>
+                              <span className="rec-year">{rec.year}</span>
+                            </div>
+                            <div className="rec-relationship">{rec.relationship}</div>
+                          </div>
+                        </div>
+
+                        <div className="rec-content">
+                          <h4 className="rec-section-title">Key Contributions</h4>
+                          <ul className="rec-bullets">
+                            {rec.bullets.map((b, bidx) => (
+                                <li key={bidx}>
+                                  <svg className="rec-check" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                                  </svg>
+                                  <span>{b}</span>
+                                </li>
+                            ))}
+                          </ul>
+
+                          <div className={`rec-quote-wrapper ${open ? 'expanded' : ''}`}>
+                            <button
+                                className="rec-expand-btn"
+                                onClick={() => toggleExpanded(rec.id)}
+                            >
+                              <span>{open ? 'Hide' : 'Read'} Full Recommendation</span>
+                              <svg
+                                  width="20"
+                                  height="20"
+                                  viewBox="0 0 24 24"
+                                  fill="currentColor"
+                                  style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+                              >
+                                <path d="M7 10l5 5 5-5z"/>
+                              </svg>
+                            </button>
+                            <blockquote className="rec-quote">
+                              <svg className="quote-icon" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" opacity="0.3">
+                                <path d="M6 17h3l2-4V7H5v6h3zm8 0h3l2-4V7h-6v6h3z"/>
+                              </svg>
+                              {rec.quote}
+                            </blockquote>
+                          </div>
+                        </div>
+                      </article>
+                  );
+                })}
+              </div>
+            </section>
         )}
 
-        {/* SPOTLIGHT VIEW */}
+        {/* Spotlight View */}
         {view === "spotlight" && (
-            <div className="recs-spotlight">
+            <section className="rec-spotlight-section">
               <div
-                  className="recs-spotCard"
+                  className="rec-spotlight-container"
                   onMouseEnter={() => setIsPaused(true)}
                   onMouseLeave={() => setIsPaused(false)}
               >
-                <button type="button" className="recs-navBtn left" onClick={prev} aria-label="Previous">
-                  ‹
+                <button
+                    className="rec-nav-btn rec-nav-prev"
+                    onClick={prev}
+                    aria-label="Previous recommendation"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/>
+                  </svg>
                 </button>
 
-                <div className="recs-spotlightStage">
+                <div className="rec-spotlight-stage">
                   {prevRec && (
-                      <div className="recs-spotLayer recs-fadeOut" aria-hidden="true">
+                      <div className="rec-spotlight-layer rec-fade-out" aria-hidden="true">
                         <SpotlightCard rec={prevRec} />
                       </div>
                   )}
-
-                  <div
-                      key={active.id}
-                      className={`recs-spotLayer ${isFading ? "recs-fadeIn" : ""}`}
-                  >
+                  <div className={`rec-spotlight-layer ${isFading ? 'rec-fade-in' : ''}`}>
                     <SpotlightCard rec={active} />
                   </div>
                 </div>
 
-                <button type="button" className="recs-navBtn right" onClick={next} aria-label="Next">
-                  ›
+                <button
+                    className="rec-nav-btn rec-nav-next"
+                    onClick={next}
+                    aria-label="Next recommendation"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/>
+                  </svg>
                 </button>
               </div>
 
-              {/* Thumbnails (stable, no overflow bugs) */}
-              <div className="recs-thumbs" role="tablist" aria-label="Recommendation picks">
-                {RECS.map((r, i) => (
+              {/* Thumbnails */}
+              <div className="rec-thumbnails">
+                {RECS.map((rec, idx) => (
                     <button
-                        key={r.id}
-                        type="button"
-                        className={`recs-thumb ${i === activeIndex ? "active" : ""}`}
-                        onClick={() => goTo(i)}
-                        role="tab"
-                        aria-selected={i === activeIndex}
+                        key={rec.id}
+                        className={`rec-thumb ${idx === activeIndex ? 'active' : ''}`}
+                        onClick={() => goTo(idx)}
                     >
-                <span className="recs-thumbTop">
-                  <span className="recs-thumbAvatar" aria-hidden="true">
-                    👤
-                  </span>
-                  <span className="recs-thumbTitle">
-                    {r.title} <span className="recs-thumbYear">{r.year}</span>
-                  </span>
-                </span>
-                      <span className="recs-thumbSub">{r.verifiedRole}</span>
+                      <div className="rec-thumb-avatar">
+                        {rec.photo ? (
+                            <img
+                                src={rec.photo}
+                                alt={rec.displayName}
+                                className="rec-thumb-avatar-img"
+                                loading="lazy"
+                            />
+                        ) : (
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            </svg>
+                        )}
+                      </div>
+                      <div className="rec-thumb-info">
+                        <div className="rec-thumb-title">{rec.title}</div>
+                        <div className="rec-thumb-role">{rec.verifiedRole}</div>
+                      </div>
+                      {idx === activeIndex && <div className="rec-thumb-indicator" />}
                     </button>
                 ))}
               </div>
-            </div>
+            </section>
         )}
       </div>
   );
