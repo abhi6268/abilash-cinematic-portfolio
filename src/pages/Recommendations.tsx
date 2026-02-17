@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import "./Recommendations.css";
 
 type ViewMode = "grid" | "spotlight";
@@ -102,20 +102,56 @@ const Recommendations: React.FC = () => {
     return () => observer.disconnect();
   }, [view]);
 
-  const goTo = (i: number) => {
-    if (i === activeIndex) return;
-    setPrevIndex(activeIndex);
-    setActiveIndex(i);
-    setExpandedId(RECS[i].id);
-    setIsFading(true);
-    setTimeout(() => {
-      setPrevIndex(null);
-      setIsFading(false);
-    }, FADE_MS);
-  };
+  const goTo = useCallback((i: number) => {
+    setActiveIndex((cur) => {
+      if (i === cur) return cur;
 
-  const next = () => goTo((activeIndex + 1) % RECS.length);
-  const prev = () => goTo((activeIndex - 1 + RECS.length) % RECS.length);
+      setPrevIndex(cur);
+      setExpandedId(RECS[i].id);
+      setIsFading(true);
+
+      window.setTimeout(() => {
+        setPrevIndex(null);
+        setIsFading(false);
+      }, FADE_MS);
+
+      return i;
+    });
+  }, []);
+
+  const next = useCallback(() => {
+    setActiveIndex((cur) => {
+      const i = (cur + 1) % RECS.length;
+
+      setPrevIndex(cur);
+      setExpandedId(RECS[i].id);
+      setIsFading(true);
+
+      window.setTimeout(() => {
+        setPrevIndex(null);
+        setIsFading(false);
+      }, FADE_MS);
+
+      return i;
+    });
+  }, []);
+
+  const prev = useCallback(() => {
+    setActiveIndex((cur) => {
+      const i = (cur - 1 + RECS.length) % RECS.length;
+
+      setPrevIndex(cur);
+      setExpandedId(RECS[i].id);
+      setIsFading(true);
+
+      window.setTimeout(() => {
+        setPrevIndex(null);
+        setIsFading(false);
+      }, FADE_MS);
+
+      return i;
+    });
+  }, []);
 
   const toggleExpanded = (id: string) => {
     setExpandedId((cur) => (cur === id ? null : id));
@@ -124,20 +160,22 @@ const Recommendations: React.FC = () => {
   // Keyboard navigation
   useEffect(() => {
     if (view !== "spotlight") return;
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "ArrowRight") next();
       if (e.key === "ArrowLeft") prev();
     };
+
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [view, activeIndex]);
+  }, [view, next, prev]);
 
   // Autoplay
   useEffect(() => {
     if (view !== "spotlight" || isPaused) return;
-    const id = setInterval(next, AUTO_MS);
-    return () => clearInterval(id);
-  }, [view, activeIndex, isPaused]);
+    const id = window.setInterval(next, AUTO_MS);
+    return () => window.clearInterval(id);
+  }, [view, isPaused, next]);
 
   const SpotlightCard = ({ rec }: { rec: Rec }) => {
     const open = expandedId === rec.id;
