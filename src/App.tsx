@@ -12,7 +12,6 @@ import ContactMe from './pages/ContactMe';
 import Layout from './Layout';
 import Music from './pages/Music';
 import Resume from './pages/Resume';
-import Timeline from "./components/Timeline";
 import BehindTheScenes from "./pages/BehindTheScenes";
 import WorkStories from "./pages/WorkStories";
 import ScrollToTop from "./components/ScrollToTop";
