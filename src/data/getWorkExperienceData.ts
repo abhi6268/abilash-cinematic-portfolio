@@ -101,7 +101,7 @@ export const WORK_EXPERIENCE: WorkExperienceItem[] = [
     },
     {
         id: 'techcloudusa',
-        company: 'TechCloudUSA',
+        company: 'Impossible Foods',
         title: 'Frontend / Mobile Engineer',
         location: 'Atlanta, GA',
         dateRange: 'Aug 2021 - Feb 2022',
